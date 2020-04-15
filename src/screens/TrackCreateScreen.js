@@ -1,37 +1,36 @@
 import '../_mockLocations';
-import React,  { useState, useEffect } from 'react';
+import React,  { useContext, useCallback} from 'react';
 import { StyleSheet} from 'react-native';
 import { Text } from 'react-native-elements';
-import { SafeAreaView } from 'react-navigation';
+import { SafeAreaView, NavigationEvents, withNavigationFocus } from 'react-navigation';
 import Map from './components/Map';
-import { requestPermissionsAsync} from 'expo-location';
+import { Context as LocationContext } from '../context/LocationContext';
+import useLocation from '../hooks/useLocation';
+import TrackForm from './components/TrackForm';
 
 
-const TrackCreateScreen = () => {
-    const [err, setErr] = useState(null);
+const TrackCreateScreen = ({isFocused}) => {
+    const { state : {recording }, addLocation} = useContext(LocationContext);
 
-    const startWatching = async () => {
-        try {
-            await requestPermissionsAsync();
-            
-        } catch(e) {
-            setErr(e)
-        }
-    }
+    const callback = useCallback( 
+        location => {
+            addLocation(location, recording);
+        }, 
+        [recording]
+    );
 
-    useEffect( () => {
-        startWatching();
-    }, []);
+    const [err] = useLocation( isFocused || recording, callback);
 
     return (
         <SafeAreaView forceInset={{ top: 'always'}}>
             <Text h2>Create a track</Text>
-            <Map></Map>
+            <Map />
             { err ? <Text>Please enable localisation</Text>: null }
+            <TrackForm />
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({})
 
-export default TrackCreateScreen;
+export default withNavigationFocus(TrackCreateScreen);
