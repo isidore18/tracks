@@ -27,9 +27,9 @@ return <>
     </Spacer>
 
     <Spacer>
-        {   !recording && locations.length 
-            ? <Button title="Save Track" onPress={saveTrack}/>
-            : null
+        {   !recording && locations.length ? (
+             <Button title="Save Track" onPress={saveTrack}/>
+            ): null
         }
     </Spacer>
     </>   
